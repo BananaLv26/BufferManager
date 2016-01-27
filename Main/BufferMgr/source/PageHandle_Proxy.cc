@@ -5,9 +5,11 @@
 PageHandle_Proxy :: PageHandle_Proxy(string myFileName, long myIndex){
 	next = nullptr;
 	prev = nullptr;
+
+	ref_count = 1;
 	fileName = myFileName;
 	index = myIndex;
-	ref_count = 1;
+	pcb = nullptr;
 }
 
 void PageHandle_Proxy :: refInc(){

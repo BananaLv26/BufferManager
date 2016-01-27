@@ -44,19 +44,19 @@ MyDB_BufferManager :: MyDB_BufferManager (size_t my_pageSize, size_t numPages, s
 	pageSize = my_pageSize;
 	// allocate all at once all pages needed from the memory
 	// put them all in the free poll
+	listFree = nullptr;
 	for(int i = 0; i < numPages; ++ i){
 		PCB* tmp = new PCB(malloc(pageSize));
-		if(listFree == nullptr) listFree = tmp;
-		else{
-			tmp->next = listFree;
-			listFree = tmp;
-		}
+		printf("pcb=%#X\n", tmp);
+		tmp->next = listFree;
+		listFree = tmp;
 	}
-
 	// unpin/pin pool is empty for now
 	listUnpin = nullptr;
 	listPin = nullptr;
 	listPhandleProxy = nullptr;
+	tmpPageCount = 0;
+	LRUCount = 0;
 	DBG("done with buffer allocation\n");
 }
 
@@ -88,8 +88,19 @@ PCB* MyDB_BufferManager :: getPCB(){
 	if(listFree){
 		PCB* tmp = listFree;
 		listFree = listFree->next;
+		DBG("listUnpin=%#X\n", listUnpin);
+		// move tmp to listUnpin // TODO differentiate between unpin and pin
+		if(!listUnpin) {
+			listUnpin = tmp;
+			tmp->next = nullptr;
+		}
+		else{
+			tmp->next = listUnpin;
+			listUnpin = tmp;
+		}
 		return tmp;
 	}
+
 
 	// when no unpin page exists
 	if(!listUnpin) return nullptr;
@@ -101,7 +112,8 @@ PCB* MyDB_BufferManager :: getPCB(){
 void* MyDB_BufferManager :: getBytes(PageHandle_Proxy* my_pHandleProxy){
 	DBG("called\n");
 	PCB* tmp = my_pHandleProxy->getPCB();
-	DBG("called\n");
+	cout << "my_pHandleProxy=" << my_pHandleProxy;
+	printf("my_pHandleProxy=%#X\n", my_pHandleProxy);
 	if(tmp == nullptr){
 		DBG("called\n");
 		tmp = getPCB();
@@ -139,7 +151,7 @@ MyDB_PageHandle MyDB_BufferManager :: helper_getPage(MyDB_TablePtr table_ptr, lo
 	if(!table_ptr){
 		ERR("error: MyDB_TablePtr null pointer!!! return nullptr");
 		return nullptr;
-	}
+	} 
 	if(index < 0){
 		ERR("error: MyDB_TablePtr null pointer!!! return nullptr");	
 		return nullptr;
@@ -151,13 +163,13 @@ MyDB_PageHandle MyDB_BufferManager :: helper_getPage(MyDB_TablePtr table_ptr, lo
 	DBG("called\n");
 	while(curr != nullptr){
 		DBG("called\n");
-		std::cout << "Follow this command: " << curr;
+		std::cout << "Follow this command: " << curr << endl;
 		if(curr->getFileName() == table_ptr->getStorageLoc() && curr->getIndex() == index) break;
 		curr = curr->next;
 	}
 
 	DBG("called\n");
-	printf("%#x\n", curr);
+	// printf("%#x\n", curr);
 	if(curr != nullptr) curr->refInc();
 	else{
 		curr = new PageHandle_Proxy(table_ptr->getStorageLoc(), index);
@@ -169,8 +181,9 @@ MyDB_PageHandle MyDB_BufferManager :: helper_getPage(MyDB_TablePtr table_ptr, lo
 		}
 	}
 
-	DBG("called\n");
+	
 	MyDB_PageHandle pPH(new MyDB_PageHandleBase(this, curr));
+	std::cout << "curr=" << curr << ",curr->next=" << curr->next << "\n";
 	DBG("called\n");
 	return pPH;
 
@@ -178,17 +191,22 @@ MyDB_PageHandle MyDB_BufferManager :: helper_getPage(MyDB_TablePtr table_ptr, lo
 
 
 PCB* MyDB_BufferManager :: LRU(){
+	DBG("called\n");
 	// pool is listUnpin
 	if(!listUnpin) return nullptr;
 
 	PCB* curr = listUnpin;
 	PCB* evict = curr;
 	while(curr){
+		DBG("called dirty=%d, LRU=%d, curr=%#X\n", curr->isDirty(), curr->getLRU(), curr);		
 		if(curr->getLRU() < evict->getLRU()) evict = curr;
 		curr = curr->next;
 	}
 
+	DBG("called %d\n", evict->isDirty());
+
 	if(evict->isDirty()) writeToDisk(evict);
+	DBG("called\n");
 	return evict;
 }
 
@@ -222,8 +240,12 @@ void MyDB_BufferManager :: readFromDisk(PCB* pcb){
 	return;
 }
 
-
 #endif
+
+
+
+
+
 
 
 

@@ -139,8 +139,8 @@ int main () {
 		DBG("called\n");
 		// look up all of the pages, and make sure they have the correct numbers
 		for (int i = 0; i < 100; i++) {
+			DBG("~~~~~~~~i=%d~~~~~~~~\n", i);
 			MyDB_PageHandle temp = myMgr.getPage (table1, i);
-			DBG("called\n");
 			char answer[64];
 			if (i < 8)
 				writeSymbols (answer, 64, i);

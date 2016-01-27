@@ -5,6 +5,9 @@
 PCB :: PCB(void* my_addr){
 	// ref_count = 0;
 	addr = my_addr;
+	LRUCount = 0;
+	bool dirty = false;
+	phandle_proxy = nullptr;
 }
 
 void PCB :: setLRU(int num){
