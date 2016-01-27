@@ -134,8 +134,8 @@ int main () {
 	// UNIT TEST 2
 	{
 		MyDB_BufferManager myMgr (64, 16, "tempDSFSD");
-		MyDB_TablePtr table1 = make_shared <MyDB_Table> ("tempTable", "/storage-home/p/pd22/comp530/A1/foobar");
-
+		// MyDB_TablePtr table1 = make_shared <MyDB_Table> ("tempTable", "/storage-home/p/pd22/comp530/A1/foobar");
+		MyDB_TablePtr table1 = make_shared <MyDB_Table> ("tempTable", "foobar");
 		DBG("called\n");
 		// look up all of the pages, and make sure they have the correct numbers
 		for (int i = 0; i < 100; i++) {

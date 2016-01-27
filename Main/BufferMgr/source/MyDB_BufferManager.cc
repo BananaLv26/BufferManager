@@ -18,12 +18,10 @@
 using namespace std;
 
 MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr table_ptr, long index) {
-	DBG("called\n");
 	return helper_getPage(table_ptr, index);
 }
 
 MyDB_PageHandle MyDB_BufferManager :: getPage () {
-	
 	MyDB_TablePtr table_ptr = make_shared <MyDB_Table> ("tempTable", "tmpFile");
 	return helper_getPage(table_ptr, tmpPageCount ++);
 }
@@ -47,7 +45,7 @@ MyDB_BufferManager :: MyDB_BufferManager (size_t my_pageSize, size_t numPages, s
 	listFree = nullptr;
 	for(int i = 0; i < numPages; ++ i){
 		PCB* tmp = new PCB(malloc(pageSize));
-		printf("pcb=%#X\n", tmp);
+		DBG("pcb=%#X\n", tmp);
 		tmp->next = listFree;
 		listFree = tmp;
 	}
@@ -80,6 +78,12 @@ MyDB_BufferManager :: ~MyDB_BufferManager () {
 		free(listPin);
 		listPin = tmp;
 	}
+
+	while(listPhandleProxy){
+		PageHandle_Proxy* tmp = listPhandleProxy->next;
+		free(listPhandleProxy);
+		listPhandleProxy = tmp;
+	}
 }
 
 
@@ -101,7 +105,6 @@ PCB* MyDB_BufferManager :: getPCB(){
 		return tmp;
 	}
 
-
 	// when no unpin page exists
 	if(!listUnpin) return nullptr;
 
@@ -112,8 +115,8 @@ PCB* MyDB_BufferManager :: getPCB(){
 void* MyDB_BufferManager :: getBytes(PageHandle_Proxy* my_pHandleProxy){
 	DBG("called\n");
 	PCB* tmp = my_pHandleProxy->getPCB();
-	cout << "my_pHandleProxy=" << my_pHandleProxy;
-	printf("my_pHandleProxy=%#X\n", my_pHandleProxy);
+	// cout << "my_pHandleProxy=" << my_pHandleProxy;
+	DBG("my_pHandleProxy=%#X\n", my_pHandleProxy);
 	if(tmp == nullptr){
 		DBG("called\n");
 		tmp = getPCB();
@@ -163,7 +166,6 @@ MyDB_PageHandle MyDB_BufferManager :: helper_getPage(MyDB_TablePtr table_ptr, lo
 	DBG("called\n");
 	while(curr != nullptr){
 		DBG("called\n");
-		std::cout << "Follow this command: " << curr << endl;
 		if(curr->getFileName() == table_ptr->getStorageLoc() && curr->getIndex() == index) break;
 		curr = curr->next;
 	}
@@ -183,7 +185,7 @@ MyDB_PageHandle MyDB_BufferManager :: helper_getPage(MyDB_TablePtr table_ptr, lo
 
 	
 	MyDB_PageHandle pPH(new MyDB_PageHandleBase(this, curr));
-	std::cout << "curr=" << curr << ",curr->next=" << curr->next << "\n";
+	// std::cout << "curr=" << curr << ",curr->next=" << curr->next << "\n";
 	DBG("called\n");
 	return pPH;
 
@@ -213,7 +215,7 @@ PCB* MyDB_BufferManager :: LRU(){
 void MyDB_BufferManager :: writeToDisk(PCB* pcb){
 	PageHandle_Proxy* tmp = pcb->getProxy();
 	// open the file the proxy is pointing to
-	int fd = open((tmp->getFileName()).c_str(), O_WRONLY | O_FSYNC);
+	int fd = open((tmp->getFileName()).c_str(), O_WRONLY | O_FSYNC | O_CREAT);
 	if(fd == -1 || lseek(fd, tmp->getIndex() * pageSize, SEEK_SET) == -1 ||
 		write(fd, pcb->getAddr(), pageSize) == -1){
 		ERR("Cannot open the file to write back!!! Should not happen!!!\n");
@@ -227,9 +229,9 @@ void MyDB_BufferManager :: writeToDisk(PCB* pcb){
 void MyDB_BufferManager :: readFromDisk(PCB* pcb){
 	PageHandle_Proxy* tmp = pcb->getProxy();
 	// open the file the proxy is pointing to
-	printf("fd = %s\n", (tmp->getFileName()).c_str());
-	int fd = open((tmp->getFileName()).c_str(), O_RDONLY | O_FSYNC);
-	printf("fd = %d\n", fd);
+	DBG("fd = %s\n", (tmp->getFileName()).c_str());
+	int fd = open((tmp->getFileName()).c_str(), O_RDONLY | O_FSYNC | O_CREAT);
+	DBG("fd = %d\n", fd);
 	if(fd == -1 || lseek(fd, tmp->getIndex() * pageSize, SEEK_SET) == -1 ||
 		read(fd, pcb->getAddr(), pageSize) == -1){
 		ERR("Cannot open the file to write back!!! Should not happen!!!\n");
