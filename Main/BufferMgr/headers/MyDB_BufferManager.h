@@ -4,6 +4,8 @@
 
 #include "MyDB_PageHandle.h"
 #include "MyDB_Table.h"
+#include "PCB.h"
+#include "PageHandle_Proxy.h"
 
 using namespace std;
 
@@ -48,11 +50,27 @@ public:
 	~MyDB_BufferManager ();
 
 	// FEEL FREE TO ADD ADDITIONAL PUBLIC METHODS 
+	PCB* getPCB();
+
+	void* getBytes(PageHandle_Proxy* my_pHandleProxy);
+	void wroteBytes(PageHandle_Proxy* my_pHandleProxy);
 
 private:
-
+	size_t pageSize;
+	// PCB is one way linked-list
+	PCB* listFree;
+	PCB* listUnpin;
+	PCB* listPin;
 	// YOUR STUFF HERE
+	// phandle proxy is two way linked-list
+	PageHandle_Proxy* listPhandleProxy;
+	long tmpPageCount;
+	long LRUCount;
 
+	MyDB_PageHandle helper_getPage(MyDB_TablePtr table_ptr, long index);
+	PCB* LRU();
+	void writeToDisk(PCB* pcb);
+	void readFromDisk(PCB* pcb);
 };
 
 #endif

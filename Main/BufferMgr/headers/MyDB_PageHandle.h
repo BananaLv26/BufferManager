@@ -3,6 +3,7 @@
 #define PAGE_HANDLE_H
 
 #include <memory>
+#include "PageHandle_Proxy.h"
 // #include "MyDB_BufferManager.h"
 
 // page handles are basically smart pointers
@@ -14,6 +15,9 @@ typedef shared_ptr <MyDB_PageHandleBase> MyDB_PageHandle;
 class MyDB_PageHandleBase {
 
 public:
+
+	// FEEL FREE TO ADD ADDITIONAL PUBLIC METHODS
+	MyDB_PageHandleBase(MyDB_BufferManager* my_pBM, PageHandle_Proxy* my_phandle_proxy);
 
 	// THESE METHODS MUST BE IMPLEMENTED WITHOUT CHANGING THE DEFINITION
 
@@ -35,11 +39,10 @@ public:
 	// become unpinned.  
 	~MyDB_PageHandleBase ();
 
-	// FEEL FREE TO ADD ADDITIONAL PUBLIC METHODS
-	MyDB_PageHandleBase(MyDB_BufferManager* my_pBM);
 
 private:
 	MyDB_BufferManager* pBM;
+	PageHandle_Proxy* pHandleProxy;
 	// YOUR CODE HERE
 };
 

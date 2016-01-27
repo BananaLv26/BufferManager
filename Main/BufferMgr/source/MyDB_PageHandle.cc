@@ -4,19 +4,26 @@
 
 #include <memory>
 #include "MyDB_PageHandle.h"
+#include "MyDB_BufferManager.h"
+#include "PCB.h"
+#include "pu_debug.h"
+
+MyDB_PageHandleBase :: MyDB_PageHandleBase(MyDB_BufferManager* my_pBM, PageHandle_Proxy* my_phandle_proxy){
+	pBM = my_pBM;
+	pHandleProxy = my_phandle_proxy;
+}
 
 void *MyDB_PageHandleBase :: getBytes () {
-	return nullptr;
+	return pBM->getBytes(pHandleProxy);
 }
 
 void MyDB_PageHandleBase :: wroteBytes () {
+	// change the dirty bit
+	pBM->wroteBytes(pHandleProxy);
 }
+
 
 MyDB_PageHandleBase :: ~MyDB_PageHandleBase () {
-}
-
-MyDB_PageHandleBase :: MyDB_PageHandleBase(MyDB_BufferManager* my_pBM){
-	pBM = my_pBM;
 }
 
 #endif

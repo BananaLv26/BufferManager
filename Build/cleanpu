@@ -1,0 +1,2 @@
+#!/bin/bash
+~/scons/bin/scons-2.4.1 -c
