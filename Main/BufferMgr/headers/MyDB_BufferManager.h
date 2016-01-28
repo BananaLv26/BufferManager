@@ -50,26 +50,49 @@ public:
 	~MyDB_BufferManager ();
 
 	// FEEL FREE TO ADD ADDITIONAL PUBLIC METHODS 
-	PCB* getPCB();
+	// get a free page (pcb)
+	PCB* getPCB(bool pinned);
 
+	// server function for client's getBytes
 	void* getBytes(PageHandle_Proxy* my_pHandleProxy);
+
+	// server function for client's wroteBytes;
 	void wroteBytes(PageHandle_Proxy* my_pHandleProxy);
+
+	// free the page corresponding to the proxy
+	void freePage(PageHandle_Proxy* my_pHandleProxy);
+	
+	// move the page to pin pool
+	void moveToList(PCB* pcb, int destination);
+
+	// remove a proxy if handle is gone
+	void freeProxy(PageHandle_Proxy* my_pHandleProxy);
+	
+	// for debugging purpose only 
+	void showBufferPool();
 
 private:
 	size_t pageSize;
 	// PCB is one way linked-list
-	PCB* listFree;
-	PCB* listUnpin;
-	PCB* listPin;
+	PCB* listFree; // free pool
+	PCB* listUnpin; // unpin pool
+	PCB* listPin; // pinned pool
+	
 	// YOUR STUFF HERE
-	// phandle proxy is two way linked-list
-	PageHandle_Proxy* listPhandleProxy;
-	long tmpPageCount;
-	long LRUCount;
+	PageHandle_Proxy* listPhandleProxy; // phandle proxy is two way linked-list
+	long tmpPageCount; // for anonymous usage
+	long LRUCount; // for LRU usage
 
-	MyDB_PageHandle helper_getPage(MyDB_TablePtr table_ptr, long index);
-	PCB* LRU();
+	// helper function for getting a free page
+	MyDB_PageHandle helper_getPage(MyDB_TablePtr table_ptr, long index, bool my_pinned, bool my_anonymous);
+
+	// LRU algorithm to return a free page from the unpin pool
+	PCB* LRU(bool my_pinned);
+
+	// write func
 	void writeToDisk(PCB* pcb);
+
+	// read func
 	void readFromDisk(PCB* pcb);
 };
 

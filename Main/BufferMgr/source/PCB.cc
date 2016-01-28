@@ -3,11 +3,15 @@
 
 
 PCB :: PCB(void* my_addr){
+	next = nullptr;
+	prev = nullptr;
+
 	// ref_count = 0;
 	addr = my_addr;
 	LRUCount = 0;
 	bool dirty = false;
 	phandle_proxy = nullptr;
+	type = FREE;
 }
 
 void PCB :: setLRU(int num){
@@ -36,6 +40,14 @@ void PCB :: setProxy(PageHandle_Proxy* newProxy){
 
 void* PCB :: getAddr(){
 	return addr;
+}
+
+int PCB :: getType(){
+	return type;
+}
+
+void PCB :: setType(int my_type){
+	type = my_type;
 }
 
 PCB :: ~PCB(){
