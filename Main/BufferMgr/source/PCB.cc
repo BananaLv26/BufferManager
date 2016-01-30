@@ -1,6 +1,6 @@
 #include "PCB.h"
 #include <stdlib.h>
-
+#include "PageHandle_Proxy.h"
 
 PCB :: PCB(void* my_addr){
 	next = nullptr;

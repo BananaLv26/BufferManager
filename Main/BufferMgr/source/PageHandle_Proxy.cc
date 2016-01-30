@@ -30,6 +30,11 @@ void PageHandle_Proxy :: refDec(){
 	}
 }
 
+int PageHandle_Proxy :: getRef(){
+	return ref_count;
+}
+
+
 string PageHandle_Proxy :: getFileName(){
 	return fileName;
 }

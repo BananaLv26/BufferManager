@@ -17,6 +17,7 @@ public:
 	PageHandle_Proxy(string my_fileName, long my_index, bool my_pinned, bool my_anonymous, MyDB_BufferManager* my_pBM);
 	void refInc();
 	void refDec();
+	int getRef();
 	string getFileName();
 	long getIndex();
 	PCB* getPCB();

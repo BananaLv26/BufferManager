@@ -152,7 +152,7 @@ void* MyDB_BufferManager :: getBytes(PageHandle_Proxy* my_pHandleProxy){
 void MyDB_BufferManager :: wroteBytes(PageHandle_Proxy* my_pHandleProxy){
 	PCB* tmp = my_pHandleProxy->getPCB();
 	if(tmp == nullptr){
-		ERR("Write to a buffer that does not exist, should not happen\n");	
+		// ERR("Write to a buffer that does not exist, should not happen\n");	
 		return;
 	}
 	
@@ -163,7 +163,7 @@ void MyDB_BufferManager :: wroteBytes(PageHandle_Proxy* my_pHandleProxy){
 void MyDB_BufferManager :: freePage(PageHandle_Proxy* my_pHandleProxy){
 	PCB* tmp = my_pHandleProxy->getPCB();
 	if(tmp == nullptr){
-		ERR("Free a buffer that does not exist, should not happen\n");
+		// ERR("Free a buffer that does not exist, should not happen\n");
 		return;
 	}
 
@@ -178,6 +178,7 @@ void MyDB_BufferManager :: freePage(PageHandle_Proxy* my_pHandleProxy){
 			DBG1("pcb->prev->LRU=%d, pcb->LRU=%d, pcb->next->LRU=%d\n", tmp->prev->getLRU(), tmp->getLRU(), tmp->next->getLRU());
 
 		moveToList(my_pHandleProxy->getPCB(), UNPINNED);
+		if(my_pHandleProxy->getPCB()->isDirty()) writeToDisk(my_pHandleProxy->getPCB());
 		// setProxy type
 		my_pHandleProxy->setPinned(UNPINNED);
 		showBufferPool();
@@ -185,8 +186,11 @@ void MyDB_BufferManager :: freePage(PageHandle_Proxy* my_pHandleProxy){
 	// if anonymous page, put it back to the free pool, free the proxy	
 	else{
 		moveToList(my_pHandleProxy->getPCB(), FREE);
+		if(my_pHandleProxy->getPCB()->isDirty()) writeToDisk(my_pHandleProxy->getPCB());
 		// remove the proxy from the list
 		freeProxy(my_pHandleProxy); // placeholder
+		DBG1("FREEING UNPINNED PAGE!!!\n");
+		showBufferPool();
 	}
 
 }
@@ -271,7 +275,10 @@ void MyDB_BufferManager :: freeProxy(PageHandle_Proxy* my_pHandleProxy){
 }
 
 
+
+
 void MyDB_BufferManager :: showBufferPool(){
+#if(DBG_LEVEL <= 2)	
 	{
 		printf("\t\t\t");
 		PCB* tmp = listFree;
@@ -293,7 +300,7 @@ void MyDB_BufferManager :: showBufferPool(){
 		printf("unpin pool(%d):", count);
 		
 		tmp = listUnpin;
-		while(tmp){printf("%d(%d)->", tmp->getLRU(), tmp->getType()); tmp = tmp->next;}
+		while(tmp){printf("%d(%d)->", tmp->getLRU(), tmp->getProxy()->getRef()); tmp = tmp->next;}
 		printf("null\n");
 	}
 
@@ -310,6 +317,9 @@ void MyDB_BufferManager :: showBufferPool(){
 		while(tmp){printf("%d(%d)->", tmp->getLRU(), tmp->getType()); tmp = tmp->next;}
 		printf("null\n");
 	}
+#else
+	return;
+#endif
 }
 
 

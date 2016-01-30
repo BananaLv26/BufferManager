@@ -44,14 +44,14 @@ int main () {
 	// UNIT TEST 1: A BIG ONE!!
 	{
 
-		cout << "main[0]\n";
+		// cout << "main[0]\n";
 		// create a buffer manager 
 		MyDB_BufferManager myMgr (64, 16, "tempDSFSD");
 		MyDB_TablePtr table1 = make_shared <MyDB_Table> ("tempTable", "foobar");
 		// MyDB_TablePtr table1 = make_shared <MyDB_Table> ("tempTable", "/storage-home/p/pd22/comp530/A1/foobar");
 
 		myMgr.showBufferPool();
-		cout << "main[1]\n";
+		// cout << "main[1]\n";
 		// allocate a pinned page
 		cout << "allocating pinned page\n";
 		MyDB_PageHandle pinnedPage = myMgr.getPinnedPage (table1, 0);
@@ -60,7 +60,7 @@ int main () {
 		pinnedPage->wroteBytes ();
 
 		myMgr.showBufferPool();
-		cout << "main[2]\n";
+		// cout << "main[2]\n";
 		
 		// create a bunch of pinned pages and remember them
 		vector <MyDB_PageHandle> myHandles;
@@ -95,7 +95,7 @@ int main () {
 		}
 
 		myMgr.showBufferPool();
-		cout << "main[3]\n";
+		// cout << "main[3]\n";
 
 		// now correctly write nums at the 0th position
 		cout << "allocating unpinned page\n";
@@ -105,7 +105,7 @@ int main () {
 		anotherDude->wroteBytes ();
 
 		myMgr.showBufferPool();
-		cout << "main[4]\n";
+		// cout << "main[4]\n";
 		
 		// now do 90 more pages, for which we forget the handle immediately
 		for (int i = 10; i < 100; i++) {
@@ -118,13 +118,14 @@ int main () {
 		}
 
 		myMgr.showBufferPool();
-		cout << "main[5]\n";
+		// cout << "main[5]\n";
 
 		// now forget all of the pinned pages we were remembering
 		vector <MyDB_PageHandle> temp2;
 		myHandles = temp2;
 
-		// myMgr.showBufferPool();
+		myMgr.showBufferPool();
+		// cout << "main[5.1]\n";
 
 		// now get a pair of pages and write them
 		for (int i = 0; i < 100; i++) {
@@ -140,7 +141,7 @@ int main () {
 		}
 
 		myMgr.showBufferPool();
-		cout << "main[6]\n";
+		// cout << "main[6]\n";
 
 		// make a second table
 		MyDB_TablePtr table2 = make_shared <MyDB_Table> ("tempTable2", "barfoo");
@@ -151,8 +152,14 @@ int main () {
 			writeLetters (bytes, 64, i);
 			temp->wroteBytes ();
 		}
+
+		myMgr.showBufferPool();
+		// cout << "main[6.1]\n";
 		
 	}
+
+
+
 
 	// UNIT TEST 2
 	{
