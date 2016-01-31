@@ -96,6 +96,10 @@ int main () {
 
 		myMgr.showBufferPool();
 		// cout << "main[3]\n";
+		// myMgr.unpin(pinnedPage);
+		// cout << "main[3.1]\n";
+		myMgr.showBufferPool();
+
 
 		// now correctly write nums at the 0th position
 		cout << "allocating unpinned page\n";

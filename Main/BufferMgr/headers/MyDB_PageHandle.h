@@ -40,6 +40,8 @@ public:
 	~MyDB_PageHandleBase ();
 
 
+	PageHandle_Proxy* getProxy();
+
 private:
 	MyDB_BufferManager* pBM;
 	PageHandle_Proxy* pHandleProxy;

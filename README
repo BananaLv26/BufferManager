@@ -1,0 +1,11 @@
+Project : buffer allocator, comp530 proj1
+Author : Pu Dong(pd22), Xiangning Qi(xq11)
+Date : 01/29/2016
+
+Notes : 
+1. One debugging .h file pu_debug.h and one debugging function MyDB_BufferManager::showBufferPool() is added for debugging purpose.
+2. Two classes are added : PCB and PageHandle_Proxy. PCB is for page control block. PageHandle_Proxy is for proxies for page handles inside buffer manager.
+3. Except for MyDB_BufferManager, other classes or added functions are ill-documented.
+4. git info is also zipped... don't know how to avoid zipping it. 
+5. Git repository for this project can be found at https://github.com/putoong/BufferManager.git
+6. Please contact me if you encouter any problem when compile.

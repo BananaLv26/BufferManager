@@ -22,6 +22,10 @@ void MyDB_PageHandleBase :: wroteBytes () {
 	pBM->wroteBytes(pHandleProxy);
 }
 
+PageHandle_Proxy* MyDB_PageHandleBase :: getProxy(){
+	return pHandleProxy;
+}
+
 MyDB_PageHandleBase :: ~MyDB_PageHandleBase () {
 	// DBG2("page hanlde is called\n");
 	pHandleProxy->refDec();

@@ -1,6 +1,7 @@
 #ifndef __PU_DEBUG__
 #define __PU_DEBUG__
 
+#define DBG
 #define DBG_LEVEL 10
 // #define EBUG
 

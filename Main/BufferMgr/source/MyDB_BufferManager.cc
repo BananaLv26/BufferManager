@@ -22,7 +22,7 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr table_ptr, long ind
 }
 
 MyDB_PageHandle MyDB_BufferManager :: getPage () {
-	MyDB_TablePtr table_ptr = make_shared <MyDB_Table> ("tempTable", "tmpFile");
+	MyDB_TablePtr table_ptr = make_shared <MyDB_Table> ("tempTable", "pu_tmpFile");
 	return helper_getPage(table_ptr, tmpPageCount ++, false, true);
 }
 
@@ -31,11 +31,12 @@ MyDB_PageHandle MyDB_BufferManager :: getPinnedPage (MyDB_TablePtr table_ptr, lo
 }
 
 MyDB_PageHandle MyDB_BufferManager :: getPinnedPage () {
-	MyDB_TablePtr table_ptr = make_shared <MyDB_Table> ("tempTable", "tmpFile");
+	MyDB_TablePtr table_ptr = make_shared <MyDB_Table> ("tempTable", "pu_tmpFile");
 	return helper_getPage(table_ptr, tmpPageCount ++, true, true);
 }
 
 void MyDB_BufferManager :: unpin (MyDB_PageHandle unpinMe) {
+	unpinMe->getProxy()->setPinned(UNPINNED);
 }
 
 MyDB_BufferManager :: MyDB_BufferManager (size_t my_pageSize, size_t numPages, string tempFile){
@@ -169,7 +170,7 @@ void MyDB_BufferManager :: freePage(PageHandle_Proxy* my_pHandleProxy){
 
 	// free the page from its pool
 	// TODO
-	bool pu_pinned = my_pHandleProxy->isPinned();
+	// bool pu_pinned = my_pHandleProxy->isPinned();
 
 	// if pinned non-ananymous, downgrad it from pinned to unpinned. put in the
 	// unpin pool. don't free the proxy
@@ -278,7 +279,7 @@ void MyDB_BufferManager :: freeProxy(PageHandle_Proxy* my_pHandleProxy){
 
 
 void MyDB_BufferManager :: showBufferPool(){
-#if(DBG_LEVEL <= 2)	
+#ifdef DEBUG	
 	{
 		printf("\t\t\t");
 		PCB* tmp = listFree;
