@@ -9,6 +9,8 @@
 
 using namespace std;
 
+class MyDB_BufferManager;
+typedef shared_ptr <MyDB_BufferManager> MyDB_BufferManagerPtr;
 class MyDB_BufferManager {
 
 public:
@@ -67,9 +69,13 @@ public:
 
 	// remove a proxy if handle is gone
 	void freeProxy(PageHandle_Proxy* my_pHandleProxy);
+
+	// returns the page size
+	size_t getPageSize ();
 	
 	// for debugging purpose only 
 	void showBufferPool();
+
 
 private:
 	size_t pageSize;

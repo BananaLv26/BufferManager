@@ -275,7 +275,9 @@ void MyDB_BufferManager :: freeProxy(PageHandle_Proxy* my_pHandleProxy){
 	free(my_pHandleProxy);
 }
 
-
+size_t MyDB_BufferManager :: getPageSize (){
+	return pageSize;
+}
 
 
 void MyDB_BufferManager :: showBufferPool(){
